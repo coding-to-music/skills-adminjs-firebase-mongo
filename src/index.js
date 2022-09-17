@@ -15,10 +15,12 @@ const logger = require("./config/logger");
 const { errorConverter, errorHandler } = require("./api/middlewares/error");
 const ApiError = require("./api/helpers/ApiError");
 
+const { createDomain } = require("./api/helpers/createDomain");
+
 const {
   DomainRegistrations,
   Domains,
-  SkillUsers,
+  SkillUser,
 } = require("./api/models/skills");
 
 let server;
@@ -42,7 +44,8 @@ mongoose.connect(config.mongoose.url).then(() => {
 
   const adminOptions = {
     // We pass Category to `resources`
-    resources: [DomainRegistrations, Domains, SkillUsers],
+
+    resources: [DomainRegistrations, Domains, SkillUser],
     rootPath: "/admin",
     // We pass authenticate function to AdminJS
     authenticate,
@@ -118,8 +121,10 @@ mongoose.connect(config.mongoose.url).then(() => {
   // handle error
   app.use(errorHandler);
 
-  server = app.listen(config.port, () => {
-    logger.info(`Listening to port ${config.port}`);
+  createDomain().then(() => {
+    server = app.listen(config.port, () => {
+      logger.info(`Listening to port ${config.port}`);
+    });
   });
 });
 

@@ -10,24 +10,20 @@ const UserSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
     },
     phoneNumber: {
       type: String,
-      required: true,
     },
     email: {
       type: String,
       unique: true,
       sparse: true,
-      required: true,
     },
     registrationNumber: {
       type: String,
       index: true,
       unique: true,
       sparse: true,
-      required: true,
     },
     wing: [
       {
@@ -54,7 +50,6 @@ const UserSchema = new mongoose.Schema(
         "Physics",
         "Chemistry",
       ],
-      required: true,
     },
     role: {
       type: String,
@@ -63,7 +58,11 @@ const UserSchema = new mongoose.Schema(
     },
     zairzaMember: {
       type: Boolean,
-      required: true,
+    },
+
+    isRegisteredComplete: {
+      type: Boolean,
+      default: false,
     },
   },
   {

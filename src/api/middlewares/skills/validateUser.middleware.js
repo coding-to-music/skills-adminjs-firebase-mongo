@@ -21,15 +21,16 @@ const getAuthToken = catchAsync(async (req, res, next) => {
 
 const getFirebaseUid = catchAsync(async (req, res, next) => {
   const { authToken } = req;
-  const { uid: firebaseUid } = await admin.auth().verifyIdToken(authToken);
+  const user = await admin.auth().verifyIdToken(authToken);
 
-  req.firebaseUid = firebaseUid;
+  req.firebaseUser = user;
   next();
 });
 
 const checkIfAuthenticated = catchAsync(async (req, res, next) => {
   // search using the firebaseUid
-  const { firebaseUid } = req;
+  const { firebaseUser } = req;
+  const { uid: firebaseUid } = firebaseUser;
 
   const existingUserInDb = await SkillsUser.findOne({
     firebaseUid,
@@ -43,7 +44,8 @@ const checkIfAuthenticated = catchAsync(async (req, res, next) => {
 });
 
 const checkIfAdmin = catchAsync(async (req, res, next) => {
-  const { firebaseUid } = req;
+  const { firebaseUser } = req;
+  const { uid: firebaseUid } = firebaseUser;
 
   const existingAdminInDb = await SkillsUser.findOne({
     firebaseUid,
@@ -61,5 +63,5 @@ module.exports = {
   getAuthToken,
   getFirebaseUid,
   checkIfAuthenticated,
-  checkIfAdmin
+  checkIfAdmin,
 };

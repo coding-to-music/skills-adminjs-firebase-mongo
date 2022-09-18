@@ -8,8 +8,8 @@ const loginSkillsUser = catchAsync(async (req, res, next) => {
   const { uid: firebaseUid } = firebaseUser;
   const loginUser = await SkillAuthService.loginSkillsUser(firebaseUid);
 
-  return res.status(httpStatus.FOUND).json({
-    code: httpStatus.FOUND,
+  return res.status(httpStatus.OK).json({
+    code: httpStatus.OK,
     status: httpStatus[httpStatus.OK],
     message: "User found and logged in",
     data: loginUser,
@@ -36,7 +36,7 @@ const upDateSkillsUser = catchAsync(async (req, res, next) => {
   return res.status(httpStatus.CREATED).json({
     code: httpStatus.ACCEPTED,
     status: httpStatus[httpStatus.ACCEPTED],
-    message: "User created succesfully",
+    message: "User update succesfully",
     data: signUpUser,
   });
 });

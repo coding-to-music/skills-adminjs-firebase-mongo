@@ -19,8 +19,8 @@ const loginSkillsUser = async (firebaseUid) => {
       .exec();
     return {
       user: userInDb.toObject(),
-      domain: domainRegistration.domain.toObject(),
-      registerId: domainRegistration,
+      domain: domainRegistration?.domain.toObject() ?? {},
+      registerId: domainRegistration ?? {},
     };
   } else {
     const domain = Domains.aggregate([

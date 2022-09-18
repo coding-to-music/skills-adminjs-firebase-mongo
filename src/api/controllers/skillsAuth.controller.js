@@ -4,7 +4,8 @@ const catchAsync = require("../helpers/catchAsync");
 const { SkillAuthService } = require("../services/index");
 
 const loginSkillsUser = catchAsync(async (req, res, next) => {
-  const { firebaseUid } = req;
+  const { firebaseUser } = req;
+  const { uid: firebaseUid } = firebaseUser;
   const loginUser = await SkillAuthService.loginSkillsUser(firebaseUid);
 
   return res.status(httpStatus.FOUND).json({
@@ -16,9 +17,8 @@ const loginSkillsUser = catchAsync(async (req, res, next) => {
 });
 
 const signUpSkillsUser = catchAsync(async (req, res, next) => {
-  const { firebaseUid, body } = req;
-
-  const signUpUser = await SkillAuthService.signUpSkillsUser(firebaseUid, body);
+  const { firebaseUser } = req;
+  const signUpUser = await SkillAuthService.signUpSkillsUser(firebaseUser);
 
   return res.status(httpStatus.CREATED).json({
     code: httpStatus.CREATED,
@@ -28,7 +28,21 @@ const signUpSkillsUser = catchAsync(async (req, res, next) => {
   });
 });
 
+const upDateSkillsUser = catchAsync(async (req, res, next) => {
+  const { body, user } = req;
+
+  const signUpUser = await SkillAuthService.upDateSkillsUser(user, body);
+
+  return res.status(httpStatus.CREATED).json({
+    code: httpStatus.ACCEPTED,
+    status: httpStatus[httpStatus.ACCEPTED],
+    message: "User created succesfully",
+    data: signUpUser,
+  });
+});
+
 module.exports = {
   loginSkillsUser,
   signUpSkillsUser,
+  upDateSkillsUser,
 };

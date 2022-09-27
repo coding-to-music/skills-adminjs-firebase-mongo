@@ -93,7 +93,7 @@ const onboardingSkillUser = async (firebaseUid) => {
 
     return {
       ...updatedUser.toObject(),
-      domain: domainFetched,
+      domain: domainFetched.domainName,
       registerId: registerDomain._id,
     };
   } else {

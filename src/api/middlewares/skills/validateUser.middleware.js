@@ -59,9 +59,51 @@ const checkIfAdmin = catchAsync(async (req, res, next) => {
   next();
 });
 
+const checkIfMentor = catchAsync(async (req, res, next) => {
+  const { user } = req;
+
+  if (user.role !== "mentor")
+    next(
+      new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "User not authorized! You are not a mentor"
+      )
+    );
+
+  next();
+});
+
+const checkIfMentee = catchAsync(async (req, res, next) => {
+  const { user } = req;
+
+  if (user.role !== "member")
+    next(
+      new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "User not authorized! You are not a mentee"
+      )
+    );
+
+  const registerDomain = await domainRegistrationModel.findOne({
+    user: user._id,
+  });
+
+  if (!registerDomain)
+    next(
+      new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "User not authorized! You have not registered for any domain"
+      )
+    );
+
+  next();
+});
+
 module.exports = {
   getAuthToken,
   getFirebaseUid,
   checkIfAuthenticated,
   checkIfAdmin,
+  checkIfMentor,
+  checkIfMentee,
 };

@@ -28,21 +28,7 @@ const signUpSkillsUser = catchAsync(async (req, res, next) => {
   });
 });
 
-const upDateSkillsUser = catchAsync(async (req, res, next) => {
-  const { body, user } = req;
-
-  const signUpUser = await SkillAuthService.upDateSkillsUser(user, body);
-
-  return res.status(httpStatus.CREATED).json({
-    code: httpStatus.ACCEPTED,
-    status: httpStatus[httpStatus.ACCEPTED],
-    message: "User update succesfully",
-    data: signUpUser,
-  });
-});
-
 module.exports = {
   loginSkillsUser,
   signUpSkillsUser,
-  upDateSkillsUser,
 };

@@ -22,7 +22,6 @@ module.exports = {
   SkillsAuthController: {
     loginSkillsUser,
     signUpSkillsUser,
-    upDateSkillsUser,
   },
   domainController: {
     createDomain,

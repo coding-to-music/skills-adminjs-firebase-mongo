@@ -46,8 +46,25 @@ const onboardingSkillUser = catchAsync(async (req, res, next) => {
   });
 });
 
+const studentSubmitAssignment = catchAsync(async (req, res, next) => {
+  const { user, body } = req;
+
+  const submitAssignment = await SkillUserService.studentSubmitAssignment(
+    user,
+    body
+  );
+
+  return res.status(httpStatus.CREATED).json({
+    code: httpStatus.ACCEPTED,
+    status: httpStatus[httpStatus.ACCEPTED],
+    message: "testing submit assignment endpoint",
+    data: submitAssignment,
+  });
+});
+
 module.exports = {
   getSkillUserDetails,
   updateSkillUserDetails,
   onboardingSkillUser,
+  studentSubmitAssignment,
 };

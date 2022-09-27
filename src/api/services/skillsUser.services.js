@@ -2,8 +2,10 @@ const httpStatus = require("http-status");
 const SkillsUser = require("../models/skills/skills.user.model");
 const ApiError = require("../helpers/ApiError");
 const domainRegistrationModel = require("../models/skills/domainRegistration.model");
+const DomainRegistrations = require("../models/skills/domainRegistration.model");
 const domainsModel = require("../models/skills/domains.model");
 const { assign } = require("nodemailer/lib/shared");
+const config = require("../../config/agenda");
 
 const getSkillsUser = async (firebaseUid) => {
   const userInDb = await SkillsUser.findOne({ firebaseUid });
@@ -93,7 +95,7 @@ const onboardingSkillUser = async (firebaseUid) => {
 
     return {
       ...updatedUser.toObject(),
-      domain: domainFetched,
+      domain: domainFetched.domainName,
       registerId: registerDomain._id,
     };
   } else {
@@ -101,7 +103,7 @@ const onboardingSkillUser = async (firebaseUid) => {
     await domainFetched.save();
     return {
       ...updatedUser.toObject(),
-      domain: domainFetched,
+      domain: domainFetched.domainName,
     };
   }
 };
@@ -110,4 +112,5 @@ module.exports = {
   getSkillsUser,
   updateSkillsUser,
   onboardingSkillUser,
+  studentSubmitAssignment,
 };

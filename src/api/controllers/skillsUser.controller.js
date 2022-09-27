@@ -46,8 +46,42 @@ const onboardingSkillUser = catchAsync(async (req, res, next) => {
   });
 });
 
+const studentSubmitAssignment = catchAsync(async (req, res, next) => {
+  const { user, body } = req;
+
+  const submitAssignment = await SkillUserService.studentSubmitAssignment(
+    user,
+    body
+  );
+
+  return res.status(httpStatus.CREATED).json({
+    code: httpStatus.ACCEPTED,
+    status: httpStatus[httpStatus.ACCEPTED],
+    message: "Assignment submitted succesfully",
+    data: submitAssignment,
+  });
+});
+
+const mentorSubmitAssignment = catchAsync(async (req, res, next) => {
+  const { user, body } = req;
+
+  const submitAssignment = await SkillUserService.mentorSubmitAssignment(
+    user,
+    body
+  );
+
+  return res.status(httpStatus.CREATED).json({
+    code: httpStatus.ACCEPTED,
+    status: httpStatus[httpStatus.ACCEPTED],
+    message: "Assignment reviewed succesfully",
+    data: submitAssignment,
+  });
+});
+
 module.exports = {
   getSkillUserDetails,
   updateSkillUserDetails,
   onboardingSkillUser,
+  studentSubmitAssignment,
+  mentorSubmitAssignment,
 };

@@ -27,4 +27,16 @@ router.post(
   SkillsUserController.onboardingSkillUser
 );
 
+router.post(
+  "/student/submit",
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated],
+  SkillsUserController.studentSubmitAssignment
+);
+
+router.post(
+  "/mentor/submit",
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated],
+  SkillsUserController.mentorSubmitAssignment
+);
+
 module.exports = router;

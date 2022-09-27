@@ -108,6 +108,8 @@ const onboardingSkillUser = async (firebaseUid) => {
   }
 };
 
+const studentSubmitAssignment = (user, submissionDetails) => {};
+
 module.exports = {
   getSkillsUser,
   updateSkillsUser,

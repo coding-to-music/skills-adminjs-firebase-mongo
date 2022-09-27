@@ -3,6 +3,7 @@ const SkillsUser = require("../models/skills/skills.user.model");
 const ApiError = require("../helpers/ApiError");
 const domainRegistrationModel = require("../models/skills/domainRegistration.model");
 const domainsModel = require("../models/skills/domains.model");
+const { assign } = require("nodemailer/lib/shared");
 
 const getSkillsUser = async (firebaseUid) => {
   const userInDb = await SkillsUser.findOne({ firebaseUid });
@@ -96,6 +97,8 @@ const onboardingSkillUser = async (firebaseUid) => {
       registerId: registerDomain._id,
     };
   } else {
+    domainFetched.mentors.push(updatedUser._id);
+    await domainFetched.save();
     return {
       ...updatedUser.toObject(),
       domain: domainFetched,

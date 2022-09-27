@@ -15,6 +15,7 @@ const {
   onboardingSkillUser,
   updateSkillUserDetails,
   studentSubmitAssignment,
+  mentorSubmitAssignment,
 } = require("./skillsUser.controller");
 
 const { registerDomain } = require("./skillsDomainReg.controller");
@@ -34,6 +35,7 @@ module.exports = {
     onboardingSkillUser,
     updateSkillUserDetails,
     studentSubmitAssignment,
+    mentorSubmitAssignment,
   },
   SkillsDomainReg: {
     registerDomain,

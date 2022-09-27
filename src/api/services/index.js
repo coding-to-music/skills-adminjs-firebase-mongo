@@ -13,6 +13,7 @@ const {
   onboardingSkillUser,
   updateSkillsUser,
   studentSubmitAssignment,
+  mentorSubmitAssignment,
 } = require("./skillsUser.services");
 
 const { registerDomain } = require("./skillsDomainReg.services");
@@ -33,6 +34,7 @@ module.exports = {
     onboardingSkillUser,
     updateSkillsUser,
     studentSubmitAssignment,
+    mentorSubmitAssignment,
   },
   SkillsDomainReg: {
     registerDomain,

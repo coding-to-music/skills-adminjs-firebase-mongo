@@ -176,6 +176,7 @@ const studentSubmitAssignment = async (user, submissionDetails) => {
     throw new ApiError(httpStatus.BAD_REQUEST, err);
   }
 };
+
 const mentorSubmitAssignment = async (user, submissionDetails) => {
   const weekNo = parseInt(submissionDetails.weekNo);
   const approved = submissionDetails.approved;
@@ -256,10 +257,172 @@ const mentorSubmitAssignment = async (user, submissionDetails) => {
   }
 };
 
+const getMentorDashboardData = async (user) => {
+  const mentorData = await DomainRegistrations.aggregate([
+    {
+      $match: {
+        domain: mongoose.Types.ObjectId(req.query.domainId),
+      },
+    },
+    {
+      $lookup: {
+        from: "domains",
+        localField: "domain",
+        foreignField: "_id",
+        as: "domainObject",
+      },
+    },
+    {
+      $unwind: {
+        path: "$submissions",
+      },
+    },
+    {
+      $match: {
+        "submissions.mentor": null,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        registrationId: "$_id",
+        submission: "$submissions",
+        domain: 1,
+        domainName: {
+          $arrayElemAt: ["$domainObject.name", 0],
+        },
+      },
+    },
+  ]).catch((err) => {
+    return { status: "fail", message: err };
+  });
+
+  if (!mentorData) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "No submissions found");
+  }
+
+  return mentorData;
+};
+
+const getStudentDashboardData = async (user) => {
+  const now = Date.now();
+  let isRegistered = await DomainRegistrations.findOne({
+    user: user._id,
+  }).exec();
+  if (now < config.eventStart.getTime() || !isRegistered) {
+    domains = await Domains.find({}, { name: 1 }).exec();
+    res.render("pages/dashboard/skills", {
+      user: req.user,
+      layout: "pages/base",
+      domains,
+      isRegistered,
+    });
+  } else {
+    const maxWeeks =
+      Math.floor((now - config.weekStart.getTime()) / config.weekInterval) + 1;
+    const studentData = DomainRegistrations.aggregate([
+      {
+        $match: {
+          user: user._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "domains",
+          localField: "domain",
+          foreignField: "_id",
+          as: "domain",
+        },
+      },
+      {
+        $set: {
+          domain: {
+            $arrayElemAt: ["$domain", 0],
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$domain.tasks",
+        },
+      },
+      {
+        $project: {
+          user: 1,
+          domain: 1,
+          task: "$domain.tasks",
+          submission: {
+            $filter: {
+              input: "$submissions",
+              as: "submission",
+              cond: {
+                $eq: ["$$submission.weekNo", "$domain.tasks.weekNo"],
+              },
+            },
+          },
+        },
+      },
+      {
+        $set: {
+          "task.submission": {
+            $arrayElemAt: ["$submission", 0],
+          },
+        },
+      },
+      {
+        $unset: ["domain.mentors", "domain.tasks", "submission"],
+      },
+      {
+        $addFields: {
+          "task.resource": {
+            $cond: [
+              {
+                $gt: ["$task.weekNo", maxWeeks],
+              },
+              "$$REMOVE",
+              "$task.resource",
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            _id: "$_id",
+            user: "$user",
+            domain: "$domain",
+          },
+          tasks: {
+            $push: "$task",
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          registrationId: "$_id._id",
+          domain: "$_id.domain",
+          tasks: 1,
+        },
+      },
+    ]).catch((err) => {
+      return { status: "fail", message: err };
+    });
+
+    if (!studentData) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Bad request");
+    } else if (studentData.length === 0) {
+      return { status: "fail", message: "No submissions found" };
+    }
+  }
+};
+
 module.exports = {
   getSkillsUser,
   updateSkillsUser,
   onboardingSkillUser,
   studentSubmitAssignment,
   mentorSubmitAssignment,
+  getMentorDashboardData,
+  getStudentDashboardData,
 };

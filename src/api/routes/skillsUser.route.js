@@ -5,6 +5,8 @@ const {
   checkIfAuthenticated,
   getAuthToken,
   getFirebaseUid,
+  checkIfMentor,
+  checkIfMentee,
 } = require("../middlewares/skills/validateUser.middleware");
 
 const { SkillsUserController } = require("../controllers/index");
@@ -29,14 +31,26 @@ router.post(
 
 router.post(
   "/student/submit",
-  [getAuthToken, getFirebaseUid, checkIfAuthenticated],
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated, checkIfMentee],
   SkillsUserController.studentSubmitAssignment
 );
 
 router.post(
   "/mentor/submit",
-  [getAuthToken, getFirebaseUid, checkIfAuthenticated],
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated, checkIfMentor],
   SkillsUserController.mentorSubmitAssignment
+);
+
+router.get(
+  "/student/dashboard",
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated, checkIfMentee],
+  SkillsUserController.getStudentDashboardData
+);
+
+router.get(
+  "/mentor/dashboard",
+  [getAuthToken, getFirebaseUid, checkIfAuthenticated, checkIfMentor],
+  SkillsUserController.getMentorDashboardData
 );
 
 module.exports = router;

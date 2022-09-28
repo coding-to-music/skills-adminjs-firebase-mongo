@@ -14,6 +14,8 @@ const {
   updateSkillsUser,
   studentSubmitAssignment,
   mentorSubmitAssignment,
+  getMentorDashboardData,
+  getStudentDashboardData,
 } = require("./skillsUser.services");
 
 const { registerDomain } = require("./skillsDomainReg.services");
@@ -35,6 +37,8 @@ module.exports = {
     updateSkillsUser,
     studentSubmitAssignment,
     mentorSubmitAssignment,
+    getMentorDashboardData,
+    getStudentDashboardData,
   },
   SkillsDomainReg: {
     registerDomain,

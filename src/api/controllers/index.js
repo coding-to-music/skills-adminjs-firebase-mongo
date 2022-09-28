@@ -16,6 +16,8 @@ const {
   updateSkillUserDetails,
   studentSubmitAssignment,
   mentorSubmitAssignment,
+  getMentorDashboardData,
+  getStudentDashboardData,
 } = require("./skillsUser.controller");
 
 const { registerDomain } = require("./skillsDomainReg.controller");
@@ -36,6 +38,8 @@ module.exports = {
     updateSkillUserDetails,
     studentSubmitAssignment,
     mentorSubmitAssignment,
+    getMentorDashboardData,
+    getStudentDashboardData,
   },
   SkillsDomainReg: {
     registerDomain,

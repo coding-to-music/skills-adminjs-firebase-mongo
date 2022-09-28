@@ -78,10 +78,40 @@ const mentorSubmitAssignment = catchAsync(async (req, res, next) => {
   });
 });
 
+const getMentorDashboardData = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const mentorDashboardData = await SkillUserService.getMentorDashboardData(
+    user
+  );
+
+  return res.status(httpStatus.FOUND).json({
+    code: httpStatus.FOUND,
+    status: httpStatus[httpStatus.FOUND],
+    message: "Mentor dashboard data fetched succesfully",
+    data: mentorDashboardData,
+  });
+});
+
+const getStudentDashboardData = catchAsync(async (req, res, next) => {
+  const { user } = req;
+  const studentDashboardData = await SkillUserService.getStudentDashboardData(
+    user
+  );
+  
+  return res.status(httpStatus.FOUND).json({
+    code: httpStatus.FOUND,
+    status: httpStatus[httpStatus.FOUND],
+    message: "Student dashboard data fetched succesfully",
+    data: studentDashboardData,
+  });
+});
+
 module.exports = {
   getSkillUserDetails,
   updateSkillUserDetails,
   onboardingSkillUser,
   studentSubmitAssignment,
   mentorSubmitAssignment,
+  getMentorDashboardData,
+  getStudentDashboardData,
 };

@@ -23,6 +23,19 @@ const registerDomain = async (firebaseUid, domainId) => {
 	return;
 };
 
+const getDomainRegistrationDetails = async (userInDb) => {
+  
+	  const domainRegistration = await DomainRegistrations.findOne({
+		user: userInDb._id,
+	  })
+		.populate("domain")
+		.exec();
+	  return {
+		domainRegistration: domainRegistration ?? "",
+	  };
+}
+
 module.exports = {
 	registerDomain,
+	getDomainRegistrationDetails
 };

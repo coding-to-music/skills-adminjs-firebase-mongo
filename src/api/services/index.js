@@ -18,7 +18,10 @@ const {
   getStudentDashboardData,
 } = require("./skillsUser.services");
 
-const { registerDomain } = require("./skillsDomainReg.services");
+const {
+  registerDomain,
+  getDomainRegistrationDetails,
+} = require("./skillsDomainReg.services");
 
 module.exports = {
   SkillAuthService: {
@@ -42,5 +45,6 @@ module.exports = {
   },
   SkillsDomainReg: {
     registerDomain,
+    getDomainRegistrationDetails,
   },
 };

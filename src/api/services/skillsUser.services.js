@@ -9,6 +9,7 @@ const config = require("../../config/agenda");
 const {
   checkIfMentor,
 } = require("../middlewares/skills/validateUser.middleware");
+const { sendMail } = require("../helpers/sendMail");
 
 const getSkillsUser = async (firebaseUid) => {
   const userInDb = await SkillsUser.findOne({ firebaseUid });
@@ -34,8 +35,8 @@ const updateSkillsUser = async (firebaseUid, ...otherDetails) => {
   return updateUserInDb;
 };
 
-const onboardingSkillUser = async (firebaseUid) => {
-  const userInDb = await SkillUser.findById(user._id);
+const onboardingSkillUser = async (user,body) => {
+  const userInDb = await SkillsUser.findById(user._id);
 
   if (!userInDb) {
     throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exists");
@@ -48,10 +49,11 @@ const onboardingSkillUser = async (firebaseUid) => {
     wing,
     branch,
     domain,
+    role,
     zairzaMember,
   } = body;
 
-  const updatedUser = await SkillUser.findByIdAndUpdate(
+  const updatedUser = await SkillsUser.findByIdAndUpdate(
     user._id,
     {
       $set: {
@@ -61,6 +63,7 @@ const onboardingSkillUser = async (firebaseUid) => {
         ...(wing && { wing }),
         branch,
         zairzaMember,
+        role,
         isRegisteredComplete: true,
       },
     },
@@ -97,7 +100,7 @@ const onboardingSkillUser = async (firebaseUid) => {
     });
 
     return {
-      ...updatedUser.toObject(),
+      user:{...updatedUser.toObject()},
       domain: domainFetched.domainName,
       registerId: registerDomain._id,
     };
@@ -105,7 +108,7 @@ const onboardingSkillUser = async (firebaseUid) => {
     domainFetched.mentors.push(updatedUser._id);
     await domainFetched.save();
     return {
-      ...updatedUser.toObject(),
+      user:{...updatedUser.toObject()},
       domain: domainFetched.domainName,
     };
   }

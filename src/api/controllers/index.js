@@ -20,7 +20,7 @@ const {
   getStudentDashboardData,
 } = require("./skillsUser.controller");
 
-const { registerDomain } = require("./skillsDomainReg.controller");
+const { registerDomain ,getDomainRegistration } = require("./skillsDomainReg.controller");
 
 module.exports = {
   SkillsAuthController: {
@@ -43,5 +43,6 @@ module.exports = {
   },
   SkillsDomainReg: {
     registerDomain,
+    getDomainRegistration,
   },
 };

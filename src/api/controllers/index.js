@@ -14,6 +14,10 @@ const {
   getSkillUserDetails,
   onboardingSkillUser,
   updateSkillUserDetails,
+  studentSubmitAssignment,
+  mentorSubmitAssignment,
+  getMentorDashboardData,
+  getStudentDashboardData,
 } = require("./skillsUser.controller");
 
 const { registerDomain } = require("./skillsDomainReg.controller");
@@ -22,7 +26,6 @@ module.exports = {
   SkillsAuthController: {
     loginSkillsUser,
     signUpSkillsUser,
-    upDateSkillsUser,
   },
   domainController: {
     createDomain,
@@ -33,6 +36,10 @@ module.exports = {
     getSkillUserDetails,
     onboardingSkillUser,
     updateSkillUserDetails,
+    studentSubmitAssignment,
+    mentorSubmitAssignment,
+    getMentorDashboardData,
+    getStudentDashboardData,
   },
   SkillsDomainReg: {
     registerDomain,

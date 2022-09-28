@@ -21,10 +21,4 @@ router.post(
   SkillsAuthController.signUpSkillsUser
 );
 
-router.post(
-  "/updateuser",
-  [getAuthToken, getFirebaseUid, checkIfAuthenticated],
-  SkillsAuthController.upDateSkillsUser
-);
-
 module.exports = router;

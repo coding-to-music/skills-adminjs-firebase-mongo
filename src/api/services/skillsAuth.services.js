@@ -17,28 +17,33 @@ const loginSkillsUser = async (firebaseUid) => {
     })
       .populate("domain")
       .exec();
-    return {
+    console.log({
       user: userInDb.toObject(),
+      domain: domainRegistration?.domain.toObject().domainName ?? "",
+      registerId: domainRegistration?._id ?? "",
+    })
+    return {
+      ...userInDb.toObject(),
       domain: domainRegistration?.domain.toObject().domainName ?? "",
       registerId: domainRegistration?._id ?? "",
     };
   } else {
-    const domain = Domains.aggregate([
+    console.log(userInDb._id)
+    const domain = await Domains.aggregate([
       {
         $unwind: "$mentors",
-      },
+      }
+      ,
       {
         $match: {
-          "mentors.user": mongoose.Types.ObjectId(userInDb._id),
+          "mentors": mongoose.Types.ObjectId(userInDb._id),
         },
-      },
-      {
-        $unwind: "$domainRegistrations",
-      },
+      }
     ]);
+    const domainNames = domain.map((obj)=>obj.domainName);
     return {
-      user: userInDb.toObject(),
-      domain: domain.domainName,
+      ...userInDb.toObject(),
+      domain: domainNames,
     };
   }
 };

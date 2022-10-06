@@ -1,15 +1,13 @@
 const httpStatus = require("http-status");
 const SkillsUser = require("../models/skills/skills.user.model");
 const ApiError = require("../helpers/ApiError");
-const domainRegistrationModel = require("../models/skills/domainRegistration.model");
 const DomainRegistrations = require("../models/skills/domainRegistration.model");
-const domainsModel = require("../models/skills/domains.model");
-const { assign } = require("nodemailer/lib/shared");
 const config = require("../../config/agenda");
 const {
   checkIfMentor,
 } = require("../middlewares/skills/validateUser.middleware");
 const { sendMail } = require("../helpers/sendMail");
+const { Domains } = require("../models/skills");
 
 const getSkillsUser = async (firebaseUid) => {
   const userInDb = await SkillsUser.findOne({ firebaseUid });
@@ -52,7 +50,7 @@ const onboardingSkillUser = async (user,body) => {
     role,
     zairzaMember,
   } = body;
-
+  try {
   const updatedUser = await SkillsUser.findByIdAndUpdate(
     user._id,
     {
@@ -71,23 +69,23 @@ const onboardingSkillUser = async (user,body) => {
       new: true,
     }
   );
-
+  
   const domainFetched = await Domains.findOne({ domainName: domain });
-
+  
   if (!domainFetched) {
     throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
   }
-
+  
   if (user.role === "member") {
     const registerDomain = await DomainRegistrations.create({
       domain: domainFetched._id,
       user: updatedUser._id,
     });
-
+    
     domainFetched.domainRegistrations.push(registerDomain._id);
-
+    
     await domainFetched.save();
-
+    
     sendMail({
       email: updatedUser.email,
       subject: "Skills++ | Registration Successful",
@@ -95,12 +93,12 @@ const onboardingSkillUser = async (user,body) => {
         name: updatedUser.name,
         domain: domainFetched.domainName,
         forumLink:
-          `href='${domainFetched.discussionLink}'` ?? 'target="_blank"',
+        `href='${domainFetched.discussionLink}'` ?? 'target="_blank"',
       },
     });
-
+    
     return {
-      user:{...updatedUser.toObject()},
+      ...updatedUser.toObject(),
       domain: domainFetched.domainName,
       registerId: registerDomain._id,
     };
@@ -108,9 +106,18 @@ const onboardingSkillUser = async (user,body) => {
     domainFetched.mentors.push(updatedUser._id);
     await domainFetched.save();
     return {
-      user:{...updatedUser.toObject()},
+      ...updatedUser.toObject(),
       domain: domainFetched.domainName,
     };
+  }
+  }catch (error) {
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+      throw new ApiError(httpStatus.BAD_REQUEST,'User already exists');
+    }
+    else {
+      throw new ApiError(httpStatus.BAD_REQUEST,error.message);
+    }
+    
   }
 };
 

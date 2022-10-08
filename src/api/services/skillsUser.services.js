@@ -76,7 +76,7 @@ const onboardingSkillUser = async (user,body) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
   }
   
-  if (user.role === "member") {
+  if (role === "member") {
     const registerDomain = await DomainRegistrations.create({
       domain: domainFetched._id,
       user: updatedUser._id,

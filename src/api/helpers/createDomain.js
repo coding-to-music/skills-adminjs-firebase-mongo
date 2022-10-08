@@ -4,17 +4,17 @@ const createDomain = async () => {
   const allDomains = [
     "Web Development",
     "App Development",
-    "UI/UX",
-    "Graphics Designing",
     "Competitive Coding",
     "AI/ML",
+    "UI/UX",
+    "Cybersecurity",
+    "Blockchain",
+    "Devops and Cloud Computing",
     "Game Development",
+    "Graphics Designing",
     "Embedded System & IOT",
     "ROS",
     "3D and Motion Graphics",
-    "Cybersecurity",
-    "Blockchain",
-    "Devops",
   ];
   await Promise.all(
     allDomains.map(async (domain) => {

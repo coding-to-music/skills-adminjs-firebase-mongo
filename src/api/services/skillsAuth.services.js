@@ -17,18 +17,18 @@ const loginSkillsUser = async (firebaseUid) => {
     })
       .populate("domain")
       .exec();
-    console.log({
-      user: userInDb.toObject(),
-      domain: domainRegistration?.domain.toObject().domainName ?? "",
-      registerId: domainRegistration?._id ?? "",
-    })
+    // console.log({
+    //   user: userInDb.toObject(),
+    //   domain: domainRegistration?.domain.toObject().domainName ?? "",
+    //   registerId: domainRegistration?._id ?? "",
+    // })
     return {
       ...userInDb.toObject(),
       domain: domainRegistration?.domain.toObject().domainName ?? "",
       registerId: domainRegistration?._id ?? "",
     };
   } else {
-    console.log(userInDb._id)
+    // console.log(userInDb._id)
     const domain = await Domains.aggregate([
       {
         $unwind: "$mentors",
@@ -83,7 +83,9 @@ const upDateSkillsUser = async (user, body) => {
     branch,
     domain,
     zairzaMember,
+    role
   } = body;
+
 
   const updatedUser = await SkillUser.findByIdAndUpdate(
     user._id,
@@ -92,6 +94,7 @@ const upDateSkillsUser = async (user, body) => {
         name,
         phoneNumber,
         registrationNumber,
+        role,
         ...(wing && { wing }),
         branch,
         zairzaMember,
@@ -109,7 +112,7 @@ const upDateSkillsUser = async (user, body) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
   }
 
-  if (user.role === "member") {
+  if (role === "member") {
     const registerDomain = await DomainRegistrations.create({
       domain: domainFetched._id,
       user: updatedUser._id,
@@ -126,7 +129,7 @@ const upDateSkillsUser = async (user, body) => {
         name: updatedUser.name,
         domain: domainFetched.domainName,
         forumLink:
-          `href='${domainFetched.discussionLink}'` ?? 'target="_blank"',
+          `href='https://join.slack.com/t/newworkspace-zpv4998/shared_invite/zt-1hezp66bn-lPSB698vHuREsYJl9Uuwjw'`,
       },
     });
 

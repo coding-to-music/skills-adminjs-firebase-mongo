@@ -36,10 +36,11 @@ const loginSkillsUser = async (firebaseUid) => {
       ,
       {
         $match: {
-          "mentors.user": mongoose.Types.ObjectId(userInDb._id),
+           mentors : mongoose.Types.ObjectId(userInDb._id) ,
         },
       }
     ]);
+
     const domainNames = domain.map((obj)=>obj.domainName);
     return {
       ...userInDb.toObject(),

@@ -69,14 +69,14 @@ const onboardingSkillUser = async (user,body) => {
       new: true,
     }
   );
-  
-  const domainFetched = await Domains.findOne({ domainName: domain });
-  
-  if (!domainFetched) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
-  }
+ 
   
   if (role === "member") {
+    const domainFetched = await Domains.findOne({ domainName: domain });
+    
+    if (!domainFetched) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
+    }
     const registerDomain = await DomainRegistrations.create({
       domain: domainFetched._id,
       user: updatedUser._id,
@@ -103,11 +103,21 @@ const onboardingSkillUser = async (user,body) => {
       registerId: registerDomain._id,
     };
   } else {
-    domainFetched.mentors.push(updatedUser._id);
-    await domainFetched.save();
+
+    await Promise.all(
+      domain.map(async (domainItem) => {
+        const domainFetched = await Domains.findOne({ domainName: domainItem });
+        if (!domainFetched) {
+          throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
+        }
+        domainFetched.mentors.push(updatedUser._id);
+        await domainFetched.save();
+      })
+    );
+    
     return {
       ...updatedUser.toObject(),
-      domain: domainFetched.domainName,
+      domain: domain,
     };
   }
   }catch (error) {

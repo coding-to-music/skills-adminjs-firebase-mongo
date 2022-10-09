@@ -36,7 +36,7 @@ const loginSkillsUser = async (firebaseUid) => {
       ,
       {
         $match: {
-          "mentors": mongoose.Types.ObjectId(userInDb._id),
+          "mentors.user": mongoose.Types.ObjectId(userInDb._id),
         },
       }
     ]);

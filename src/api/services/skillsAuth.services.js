@@ -129,6 +129,7 @@ const upDateSkillsUser = async (user, body) => {
       data: {
         name: updatedUser.name,
         domain: domainFetched.domainName,
+        resourceLink: domainFetched.tasks[0].resourceLink,
         forumLink:
           `href='https://join.slack.com/t/newworkspace-zpv4998/shared_invite/zt-1hezp66bn-lPSB698vHuREsYJl9Uuwjw'`,
       },

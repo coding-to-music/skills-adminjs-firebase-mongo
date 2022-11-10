@@ -34,7 +34,7 @@ const updateSkillsUser = async (firebaseUid, ...otherDetails) => {
   return updateUserInDb;
 };
 
-const onboardingSkillUser = async (user,body) => {
+const onboardingSkillUser = async (user, body) => {
   const userInDb = await SkillsUser.findById(user._id);
 
   if (!userInDb) {
@@ -52,83 +52,81 @@ const onboardingSkillUser = async (user,body) => {
     zairzaMember,
   } = body;
   try {
-  const updatedUser = await SkillsUser.findByIdAndUpdate(
-    user._id,
-    {
-      $set: {
-        name,
-        phoneNumber,
-        registrationNumber,
-        ...(wing && { wing }),
-        branch,
-        zairzaMember,
-        role,
-        isRegisteredComplete: true,
+    const updatedUser = await SkillsUser.findByIdAndUpdate(
+      user._id,
+      {
+        $set: {
+          name,
+          phoneNumber,
+          registrationNumber,
+          ...(wing && { wing }),
+          branch,
+          zairzaMember,
+          role,
+          isRegisteredComplete: true,
+        },
       },
-    },
-    {
-      new: true,
-    }
-  );
- 
-  
-  if (role === "member") {
-    const domainFetched = await Domains.findOne({ domainName: domain });
-    
-    if (!domainFetched) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
-    }
-    const registerDomain = await DomainRegistrations.create({
-      domain: domainFetched._id,
-      user: updatedUser._id,
-    });
-    
-    domainFetched.domainRegistrations.push(registerDomain._id);
-    
-    await domainFetched.save();
-    
-    sendMail({
-      email: updatedUser.email,
-      subject: "Skills++ | Registration Successful",
-      data: {
-        name: updatedUser.name,
-        domain: domainFetched.domainName,
-        forumLink:
-        `href='${domainFetched.discussionLink}'` ?? 'target="_blank"',
-      },
-    });
-    
-    return {
-      ...updatedUser.toObject(),
-      domain: domainFetched.domainName,
-      registerId: registerDomain._id,
-    };
-  } else {
-
-    await Promise.all(
-      domain.map(async (domainItem) => {
-        const domainFetched = await Domains.findOne({ domainName: domainItem });
-        if (!domainFetched) {
-          throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
-        }
-        domainFetched.mentors.push(updatedUser._id);
-        await domainFetched.save();
-      })
+      {
+        new: true,
+      }
     );
-    
-    return {
-      ...updatedUser.toObject(),
-      domain: domain,
-    };
-  }
-  }catch (error) {
-    if (error.name === 'MongoServerError' && error.code === 11000) {
-      throw new ApiError(httpStatus.BAD_REQUEST,'User already exists');
+
+    if (role === "member") {
+      const domainFetched = await Domains.findOne({ domainName: domain });
+
+      if (!domainFetched) {
+        throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
+      }
+      const registerDomain = await DomainRegistrations.create({
+        domain: domainFetched._id,
+        user: updatedUser._id,
+      });
+
+      domainFetched.domainRegistrations.push(registerDomain._id);
+
+      await domainFetched.save();
+      sendMail({
+        email: updatedUser.email,
+        subject: "Skills++ | Registration Successful",
+        data: {
+          name: updatedUser.name,
+          domain: domainFetched.domainName,
+          resourceLink: domainFetched.tasks[0]?.resourceLink,
+          forumLink:
+            "https://join.slack.com/t/newworkspace-zpv4998/shared_invite/zt-1hezp66bn-lPSB698vHuREsYJl9Uuwjw",
+        },
+      });
+
+      return {
+        ...updatedUser.toObject(),
+        domain: domainFetched.domainName,
+        registerId: registerDomain._id,
+      };
+    } else {
+      await Promise.all(
+        domain.map(async (domainItem) => {
+          const domainFetched = await Domains.findOne({
+            domainName: domainItem,
+          });
+          if (!domainFetched) {
+            throw new ApiError(httpStatus.NOT_FOUND, "Domain not found");
+          }
+          domainFetched.mentors.push(updatedUser._id);
+          await domainFetched.save();
+        })
+      );
+
+      return {
+        ...updatedUser.toObject(),
+        domain: domain,
+      };
     }
-    else {
-      throw new ApiError(httpStatus.BAD_REQUEST,error.message);
+  } catch (error) {
+    if (error.name === "MongoServerError" && error.code === 11000) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "User already exists");
+    } else {
+      throw new ApiError(httpStatus.BAD_REQUEST, error.message);
     }
-    
   }
 };
 
@@ -168,7 +166,7 @@ const studentSubmitAssignment = async (user, submissionDetails) => {
     },
     { new: true }
   ).catch((err) => {
-    return { status: "fail", message: err };
+    return { status: "fail", message: err }; // must be converted to ApiError
   });
 
   const registration2 = await DomainRegistrations.findOneAndUpdate(

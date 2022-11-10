@@ -80,11 +80,12 @@ const mentorSubmitAssignment = catchAsync(async (req, res, next) => {
 
 const getMentorDashboardData = catchAsync(async (req, res, next) => {
   const { user } = req;
+  const {domainId} = req.query;
   const mentorDashboardData = await SkillUserService.getMentorDashboardData(
-    user
+    user,domainId
   );
 
-  return res.status(httpStatus.FOUND).json({
+  return res.status(httpStatus.ACCEPTED).json({
     code: httpStatus.FOUND,
     status: httpStatus[httpStatus.FOUND],
     message: "Mentor dashboard data fetched succesfully",
@@ -98,7 +99,7 @@ const getStudentDashboardData = catchAsync(async (req, res, next) => {
     user
   );
   
-  return res.status(httpStatus.FOUND).json({
+  return res.status(httpStatus.ACCEPTED).json({
     code: httpStatus.FOUND,
     status: httpStatus[httpStatus.FOUND],
     message: "Student dashboard data fetched succesfully",

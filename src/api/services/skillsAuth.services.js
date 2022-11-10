@@ -40,8 +40,7 @@ const loginSkillsUser = async (firebaseUid) => {
         },
       }
     ]);
-
-    const domainNames = domain.map((obj)=>obj.domainName);
+    const domainNames = domain.map((obj)=>({domainName:obj.domainName, domainId:obj._id})); // Changed Mentor Response
     return {
       ...userInDb.toObject(),
       domain: domainNames,

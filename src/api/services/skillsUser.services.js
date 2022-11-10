@@ -6,6 +6,7 @@ const config = require("../../config/agenda");
 const {
   checkIfMentor,
 } = require("../middlewares/skills/validateUser.middleware");
+const mongoose = require("mongoose");
 const { sendMail } = require("../helpers/sendMail");
 const { Domains } = require("../models/skills");
 
@@ -132,19 +133,22 @@ const onboardingSkillUser = async (user,body) => {
 };
 
 const studentSubmitAssignment = async (user, submissionDetails) => {
+  console.log(submissionDetails)
   const today = Date.now();
   const diff = today - config.weekStart + 1;
   const weekNo = submissionDetails.weekNo;
-
+  console.log(weekNo)
   if (1 > weekNo || weekNo > config.maxWeekNos)
-    return { status: "fail", message: "Invalid week number" };
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,"Invalid week Number");
 
   const weekStartTime = (weekNo - 1) * config.weekInterval;
   const weekEndTime = weekNo * config.weekInterval + config.extraTime;
-  if (diff < weekStartTime || diff >= weekEndTime) {
-    return res
-      .status(500)
-      .send({ status: "fail", message: "Submission deadline has passed" });
+  console.log(diff,weekStartTime,weekEndTime);
+  if (diff >= weekEndTime) {
+   throw new ApiError(httpStatus.BAD_REQUEST,"Assignment submission time is over");
+  }
+  else if(diff < weekStartTime){
+    throw new ApiError(httpStatus.BAD_REQUEST,"Assignment submission time is not started yet");
   }
 
   let registration;
@@ -167,7 +171,7 @@ const studentSubmitAssignment = async (user, submissionDetails) => {
     return { status: "fail", message: err };
   });
 
-  registration = DomainRegistrations.findOneAndUpdate(
+  const registration2 = await DomainRegistrations.findOneAndUpdate(
     { user: user._id },
     {
       $set: {
@@ -180,18 +184,15 @@ const studentSubmitAssignment = async (user, submissionDetails) => {
       arrayFilters: [{ "elem.weekNo": weekNo }],
     }
   ).catch((err) => {
-    return { status: "fail", message: err };
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, err.message);
   });
-
-  if (!registration) {
-    return {
-      status: "fail",
-      message: "User not registered for this domain",
-    };
+ 
+  if (!registration2) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,"User not registered for this domain");
   }
 
   try {
-    return registration;
+    return registration2;
   } catch (err) {
     throw new ApiError(httpStatus.BAD_REQUEST, err);
   }
@@ -199,32 +200,29 @@ const studentSubmitAssignment = async (user, submissionDetails) => {
 
 const mentorSubmitAssignment = async (user, submissionDetails) => {
   const weekNo = parseInt(submissionDetails.weekNo);
-  const approved = submissionDetails.approved;
 
   if (1 > weekNo || weekNo > config.maxWeekNos)
     return { status: "fail", message: "Invalid week number" };
 
   if (!submissionDetails.comment) {
-    return {
-      status: "fail",
-      message: "Comment required",
-    };
+    throw new ApiError(401,"Comment is required");
   }
 
-  if (
-    Date.now() - config.weekStart <
-    weekNo * config.weekInterval + config.extraTime
-  ) {
-    return { status: "fail", message: "Cannot approve before week ends" };
-  }
+  // if (
+  //   Date.now() - config.weekStart <
+  //   weekNo * config.weekInterval + config.extraTime
+  // ) {
+  //   throw new ApiError(401,"Cannot Approve before week ends");
+  // }
   let registration;
   registration = await DomainRegistrations.findOneAndUpdate(
     {
-      domain: submissionDetails.domainId,
+      _id:submissionDetails.registrationId,
+      domain: submissionDetails.domainId
     },
     {
       $set: {
-        "submissions.$[elem].approved": approved,
+        "submissions.$[elem].approved": submissionDetails.approved,
         "submissions.$[elem].comment": submissionDetails.comment,
         "submissions.$[elem].mentor": user._id,
       },
@@ -251,7 +249,7 @@ const mentorSubmitAssignment = async (user, submissionDetails) => {
       // Marks calculation logic
 
       let mark = 0;
-      if (approved) {
+      if (submissionDetails.approved) {
         let diff =
           week.updatedAt -
           config.weekStart -
@@ -277,11 +275,11 @@ const mentorSubmitAssignment = async (user, submissionDetails) => {
   }
 };
 
-const getMentorDashboardData = async (user) => {
+const getMentorDashboardData = async (user,domainId) => {
   const mentorData = await DomainRegistrations.aggregate([
     {
       $match: {
-        domain: mongoose.Types.ObjectId(req.query.domainId),
+        domain: mongoose.Types.ObjectId(domainId),
       },
     },
     {
@@ -301,7 +299,8 @@ const getMentorDashboardData = async (user) => {
       $match: {
         "submissions.mentor": null,
       },
-    },
+    }
+    ,
     {
       $project: {
         _id: 0,
@@ -309,12 +308,12 @@ const getMentorDashboardData = async (user) => {
         submission: "$submissions",
         domain: 1,
         domainName: {
-          $arrayElemAt: ["$domainObject.name", 0],
+          $arrayElemAt: ["$domainObject.domainName", 0],
         },
       },
     },
   ]).catch((err) => {
-    return { status: "fail", message: err };
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR,err.message);
   });
 
   if (!mentorData) {
@@ -330,8 +329,8 @@ const getStudentDashboardData = async (user) => {
     user: user._id,
   }).exec();
   if (now < config.eventStart.getTime() || !isRegistered) {
-    domains = await Domains.find({}, { name: 1 }).exec();
-    res.render("pages/dashboard/skills", {
+    const domains = await Domains.find({}, { name: 1 }).exec();
+    console.log({
       user: req.user,
       layout: "pages/base",
       domains,
@@ -361,11 +360,16 @@ const getStudentDashboardData = async (user) => {
           },
         },
       },
-      {
-        $unwind: {
-          path: "$domain.tasks",
-        },
-      },
+      // {
+      //   $project: {
+      //     task:"$domain.tasks"
+      //   }
+      // },
+      // {
+      //   $unwind: {
+      //     path: "$domain.tasks",
+      //   },
+      // },
       {
         $project: {
           user: 1,
@@ -382,49 +386,49 @@ const getStudentDashboardData = async (user) => {
           },
         },
       },
-      {
-        $set: {
-          "task.submission": {
-            $arrayElemAt: ["$submission", 0],
-          },
-        },
-      },
-      {
-        $unset: ["domain.mentors", "domain.tasks", "submission"],
-      },
-      {
-        $addFields: {
-          "task.resource": {
-            $cond: [
-              {
-                $gt: ["$task.weekNo", maxWeeks],
-              },
-              "$$REMOVE",
-              "$task.resource",
-            ],
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            _id: "$_id",
-            user: "$user",
-            domain: "$domain",
-          },
-          tasks: {
-            $push: "$task",
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          registrationId: "$_id._id",
-          domain: "$_id.domain",
-          tasks: 1,
-        },
-      },
+      // {
+      //   $set: {
+      //     "task.submission": {
+      //       $arrayElemAt: ["$submission", 0],
+      //     },
+      //   },
+      // },
+      // {
+      //   $unset: ["domain.mentors", "domain.tasks", "submission"],
+      // },
+      // {
+      //   $addFields: {
+      //     "task.resource": {
+      //       $cond: [
+      //         {
+      //           $gt: ["$task.weekNo", maxWeeks],
+      //         },
+      //         "$$REMOVE",
+      //         "$task.resource",
+      //       ],
+      //     },
+      //   },
+      // },
+      // {
+      //   $group: {
+      //     _id: {
+      //       _id: "$_id",
+      //       user: "$user",
+      //       domain: "$domain",
+      //     },
+      //     tasks: {
+      //       $push: "$task",
+      //     },
+      //   },
+      // },
+      // {
+      //   $project: {
+      //     _id: 0,
+      //     registrationId: "$_id._id",
+      //     domain: "$_id.domain",
+      //     tasks: 1,
+      //   },
+      // },
     ]).catch((err) => {
       return { status: "fail", message: err };
     });
@@ -433,6 +437,8 @@ const getStudentDashboardData = async (user) => {
       throw new ApiError(httpStatus.BAD_REQUEST, "Bad request");
     } else if (studentData.length === 0) {
       return { status: "fail", message: "No submissions found" };
+    }else{
+      return studentData;
     }
   }
 };

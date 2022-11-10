@@ -3,6 +3,7 @@ const ApiError = require("../../helpers/ApiError");
 const catchAsync = require("../../helpers/catchAsync");
 const SkillsUser = require("../../models/skills/skills.user.model");
 const admin = require("../../helpers/firebase");
+const domainRegistrationModel = require("../../models/skills/domainRegistration.model");
 
 // 1st call get auth token , then getFirebaseUid then call checkIfAuthenticated
 

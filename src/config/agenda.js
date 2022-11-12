@@ -1,9 +1,9 @@
 module.exports = {
   // TODO: change dates
-  registrationStart: new Date("2021-09-25 19:30:00"), // Registration starts for skills++
-  registrationEnd: new Date("2022-09-29 00:00:00"), // Registration stops for skills++
-  eventStart: new Date("2022-10-03 00:00:00"), // Skills++ event starts
-  weekStart: new Date("2022-10-28 00:00:00"), // Week 1 starts for skills++
+  registrationStart: new Date("2021-11-12 19:30:00"), // Registration starts for skills++
+  registrationEnd: new Date("2022-11-16 00:00:00"), // Registration stops for skills++
+  eventStart: new Date("2022-11-12 00:00:00"), // Skills++ event starts
+  weekStart: new Date("2022-11-17 00:00:00"), // Week 1 starts for skills++
   weekInterval: 7 * 24 * 60 * 60 * 1000,
   maxWeekNos: 4,
   extraTime: 2 * 24 * 60 * 60 * 1000,

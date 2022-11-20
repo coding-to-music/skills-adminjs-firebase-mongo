@@ -93,7 +93,7 @@ const onboardingSkillUser = async (user, body) => {
           domain: domainFetched.domainName,
           resourceLink: domainFetched.tasks[0]?.resourceLink,
           forumLink:
-            "https://join.slack.com/t/newworkspace-zpv4998/shared_invite/zt-1hezp66bn-lPSB698vHuREsYJl9Uuwjw",
+            "https://zairzaskills2k22.slack.com/archives/C0465PUJ8V6",
         },
       });
 

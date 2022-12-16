@@ -1,9 +1,10 @@
 {
-  "name": "backend",
+  "name": "skills-adminjs-firebase-mongo",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "deploy": "git add . && git commit -m Build && git push",
     "start": "cross-env NODE_ENV=development node src/index.js",
     "start:prod": "cross-env NODE_ENV=production node src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js"

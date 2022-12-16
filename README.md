@@ -1,3 +1,31 @@
+# skills-adminjs-firebase-mongo
+
+# 🚀 skills app with adminjs firebase mongo 🚀
+
+https://github.com/coding-to-music/skills-adminjs-firebase-mongo
+
+https://skills-adminjs-firebase-mongo.vercel.app
+
+From / By https://github.com/zairza-cetb/skills-backend
+
+## Environment variables:
+
+```java
+
+```
+
+## GitHub
+
+```java
+git init
+git add .
+git remote remove origin
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:coding-to-music/skills-adminjs-firebase-mongo.git
+git push -u origin main
+```
+
 # Zairza Web Backend
 
 The official backend of Zairza !
@@ -59,8 +87,8 @@ Controllers should try to catch the errors and forward them to the error handlin
 const catchAsync = require("../utils/catchAsync");
 
 const controller = catchAsync(async (req, res) => {
-	// this error will be forwarded to the error handling middleware
-	throw new Error("Something wrong happened");
+  // this error will be forwarded to the error handling middleware
+  throw new Error("Something wrong happened");
 });
 ```
 
@@ -68,8 +96,8 @@ The error handling middleware sends an error response, which has the following f
 
 ```json
 {
-	"code": 404,
-	"message": "Not found"
+  "code": 404,
+  "message": "Not found"
 }
 ```
 
@@ -85,10 +113,10 @@ const ApiError = require("../utils/ApiError");
 const User = require("../models/User");
 
 const getUser = async (userId) => {
-	const user = await User.findById(userId);
-	if (!user) {
-		throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-	}
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
 };
 ```
 

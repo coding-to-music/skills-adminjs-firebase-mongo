@@ -104,7 +104,7 @@ mongoose.connect(config.mongoose.url).then(() => {
     return res.status(httpStatus.OK).json({
       code: httpStatus.OK,
       status: httpStatus[200],
-      message: "Hi welcome to Zairza Backend",
+      message: "Hi welcome to skills-adminjs-firebase-mongo Backend",
       data: null,
     });
   });
@@ -123,7 +123,7 @@ mongoose.connect(config.mongoose.url).then(() => {
 
   createDomain().then(() => {
     server = app.listen(config.port, () => {
-      logger.info(`Listening to port ${config.port}`);
+      logger.info(`Listening to http://localhost:${config.port}`);
     });
   });
 });

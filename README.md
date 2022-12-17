@@ -11,6 +11,26 @@ From / By https://github.com/zairza-cetb/skills-backend
 ## Environment variables:
 
 ```java
+# URI of the Mongo DB
+MONGO_URI='mongo_uri for storing data
+
+# Firebase credentials
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_ID=
+FIREBASE_PRIVATE_KEY=
+
+# Nodemailer details
+
+NODEMAILER_EMAIL=
+NODEMAILER_PASS=
+
+# AdminJS
+
+ADMINJS_EMAIL=
+ADMINJS_PASSWORD=
+POSTGRES_URI=
+ADMINJS_SECRET=
+
 
 ```
 
